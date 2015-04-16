@@ -14,37 +14,23 @@
     --(10) Include good code quality including comments, proper indentation, and function structure.
 
     -- Need to load the widget library before using it ----
-    local allObjects = display.newGroup()
     local widget = require( "widget" )
+    local textedit = require( "textedit" )
+    local billAmount
+    local numberOfPayeesFieldWidget
+  --  local billIncludingTip
+
+    -- Get the screen size
+    local WIDTH = display.contentWidth
+    local HEIGHT = display.contentHeight
+    local dollarText
+
+    -- File local variables
+    local fontSize = 15
     local billAmountField
     local tipPercent = 0
-    local numberOfPayeesFieldWidget
-    --local numberOfPayeesFieldField
- -----------------------------------------------------------------------------------------
- --
- -- main.lua
- --
- -- Demo of using the textedit module to simulate/use native text edit fields.
- -----------------------------------------------------------------------------------------
-
- -- Load ability to simulate text fields
-
-
-
-
- local textedit = require( "textedit" )
-
- -- Get the screen size
- local WIDTH = display.contentWidth
- local HEIGHT = display.contentHeight
- local dollarText
-
- -- File local variables
- local fontSize = 15
- local billAmountField
- local tipPercent = 0
- local numberOfPayeesField
- local billAmountFieldText
+    local numberOfPayeesField
+    local billAmountFieldText
 
 
  -- Create all the controls and do other initialization
@@ -60,7 +46,7 @@
    segmentedControl = widget.newSegmentedControl
   {
       left = 10,
-      top = 180,
+      top = 220,
       segments = { "0%","5%","10%","15%","20%","25%" },
       defaultSegment = 1,
       onPress = onSegmentPress
@@ -70,7 +56,7 @@
  			{ inputType = "decimal", size = fontSize, placeholder = "0"} )
 
  	-- Make a label for the billAmountField field
- 	dollarText = display.newText("Bill Amount:", 100, billAmountField.y, native.systemFont, fontSize )
+ 	dollarText = display.newText("Bill Before Tip: ", 100, billAmountField.y, native.systemFont, fontSize )
 
 
  	-- Create a text input field for tip percentage
@@ -81,9 +67,19 @@
  	display.newText("# Of Payees:", numberOfPayeesField.x -numberOfPayeesField.width+20, numberOfPayeesField.y, native.systemFont, fontSize )
 
  	-- Create a text label for the Total Payment result
- 	tipPerEachPerson = display.newText("", WIDTH / 2, 150, native.systemFont, fontSize)
- 	tipPerEachPerson:setFillColor(0, 1, 0)
-   allObjects.insert(billAmountField)
+
+
+   tipPercentText = display.newText("Tip Percentage", WIDTH / 2, 200, native.systemFont, fontSize)
+ 	 amountDueFromEachPerson = display.newText("", WIDTH / 2, tipPercentText.y-2*fontSize, native.systemFont, fontSize)
+   tipAmount = display.newText("", WIDTH / 2, amountDueFromEachPerson.y-fontSize, native.systemFont, fontSize)
+   billIncludingTip = display.newText("", WIDTH / 2, tipAmount.y-fontSize, native.systemFont, fontSize)
+
+
+   tipPercentText:setFillColor(0,.5,1)
+   amountDueFromEachPerson:setFillColor(0, 1, 0)
+   tipAmount:setFillColor(0,1,0)
+   billIncludingTip:setFillColor(0,1,0)
+
 end
 
  -- Update the calculations based on the text in the edit fields
@@ -99,11 +95,22 @@ end
  			numberOfPayees = 1
  		end
 
- 		-- divide the bill by the number of payees and multiply it by tip percentage
-      tipPerEachPerson.amount = (billAmount / numberOfPayees ) * tipPercent
- 		tipPerEachPerson.text = string.format("Tip Amount for Each Payee = " .. "%.2f ", tipPerEachPerson.amount)
+
+     --find the total amount of tip, then the bill including tip, and lastly how it divides out
+     tipAmount.amount = billAmount*(tipPercent)
+     billIncludingTipAmount = billAmount*(1+tipPercent)
+     amountDueFromEachPerson.amount = (billIncludingTipAmount / numberOfPayees )
+
+     tipAmount.text = string.format("Tip Amount = " .. "%.2f ", tipAmount.amount)
+     billIncludingTip.text = string.format("Total Bill = " .. "%.2f ",  billIncludingTipAmount)
+     -- divide the bill by the number of payees
+
+ 		amountDueFromEachPerson.text = string.format("Total Due from Each Payee = $" .. "%.2f ", amountDueFromEachPerson.amount)
  	else
- 		tipPerEachPerson.text = ""  -- Erase Tip Amount if bill amount is blank
+ 		amountDueFromEachPerson.text = ""  -- Erase values if bill amount is blank
+     tipAmount.text = ""
+     billIncludingTip.text = ""
+
  	end
  end
 
