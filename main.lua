@@ -14,6 +14,7 @@
     --(10) Include good code quality including comments, proper indentation, and function structure.
 
     -- Need to load the widget library before using it ----
+    local allObjects = display.newGroup()
     local widget = require( "widget" )
     local billAmountField
     local tipPercent = 0
@@ -82,7 +83,7 @@
  	-- Create a text label for the Total Payment result
  	tipPerEachPerson = display.newText("", WIDTH / 2, 150, native.systemFont, fontSize)
  	tipPerEachPerson:setFillColor(0, 1, 0)
-
+   allObjects.insert(billAmountField)
 end
 
  -- Update the calculations based on the text in the edit fields
